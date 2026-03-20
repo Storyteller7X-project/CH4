@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Storyteller — Chapter IV</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #111111;
+    --border: #1e1e1e;
+    --border-accent: #2a2a2a;
+    --yellow: #f0c040;
+    --red: #e03030;
+    --red-dim: #8b1a1a;
+    --green: #00cc66;
+    --text: #c0c0c0;
+    --text-dim: #aaa;
+    --mono: 'Share Tech Mono', monospace;
+    --display: 'Orbitron', sans-serif;
+    --body: 'Rajdhani', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 17px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  header {
+    padding: 28px 40px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--display);
+    font-size: 3.4rem;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    color: var(--yellow);
+  }
+  .logo span { color: var(--red); }
+
+  .subtitle-line {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    color: var(--text-dim);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  .goal-banner {
+    padding: 14px 40px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    color: var(--red);
+  }
+  .goal-banner strong { color: var(--yellow); letter-spacing: 0.05em; }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+  }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .discord-block {
+    background: var(--panel);
+    border: 1px solid var(--border-accent);
+    padding: 24px 28px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .discord-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--yellow);
+  }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  input[type="text"] {
+    background: #0a0a0a;
+    border: 1px solid var(--border-accent);
+    color: var(--yellow);
+    font-family: var(--mono);
+    font-size: 1.05rem;
+    padding: 12px 16px;
+    width: 100%;
+    outline: none;
+    letter-spacing: 0.08em;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus { border-color: var(--yellow); }
+  input[type="text"]::placeholder { color: var(--text-dim); font-size: 0.75rem; }
+  input[type="text"]:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .hint {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: #aaa;
+    letter-spacing: 0.1em;
+    margin-top: 6px;
+  }
+
+  .enter-btn {
+    margin-top: 16px;
+    background: transparent;
+    border: 1px solid var(--yellow);
+    color: var(--yellow);
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 14px 36px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .enter-btn:hover { background: var(--yellow); color: #000; }
+
+  /* Info box */
+  .info-box {
+    padding: 12px 18px;
+    border: 1px solid;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+    display: none;
+  }
+  .info-box.error   { border-color: var(--red); color: var(--red); background: rgba(139,26,26,0.1); }
+  .info-box.show    { display: block; }
+
+  /* ── RIDDLE ROWS ── */
+  .riddles-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .riddle-row.state-poem + .riddle-row { margin-top: -8px; }
+  .riddle-row + .riddle-row.state-poem { margin-top: -8px; }
+
+  .riddle-row {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 48px 1fr 220px;
+    align-items: stretch;
+    transition: border-color 0.2s;
+  }
+  .riddle-row:hover { border-color: var(--border-accent); }
+  .riddle-row.state-wrong    { border-color: #3a0a0a; }
+  .riddle-row.state-cooldown { border-color: #2a2200; }
+
+  /* Poem state — morph into poem line */
+  .riddle-row.state-poem {
+    border: none;
+    border-left: 2px solid #004422;
+    grid-template-columns: 48px 1fr;
+    background: transparent;
+  }
+  .riddle-row.state-poem .riddle-input-area { display: none; }
+  .riddle-row.state-poem .riddle-text {
+    border-right: none;
+    padding: 2px 16px;
+    line-height: 1.5;
+    min-height: 0;
+  }
+  .riddle-row.state-poem .riddle-num {
+    font-size: 0.6rem;
+    color: #1a4428;
+    min-height: 0;
+    padding: 2px 0;
+  }
+
+  .riddle-num {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--border);
+    letter-spacing: 0.1em;
+  }
+
+  .riddle-text {
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    line-height: 2;
+    color: var(--text);
+    letter-spacing: 0.04em;
+    border-right: 1px solid var(--border);
+    white-space: pre-wrap;
+  }
+
+  .riddle-input-area {
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+  }
+  .riddle-input-area input { font-size: 0.95rem; padding: 10px 12px; }
+
+  .riddle-submit {
+    background: transparent;
+    border: 1px solid var(--border-accent);
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .riddle-submit:hover:not(:disabled) { border-color: var(--yellow); color: var(--yellow); }
+  .riddle-submit:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .riddle-status {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    min-height: 1em;
+    text-align: center;
+  }
+  .riddle-status.ok       { color: var(--green); }
+  .riddle-status.err      { color: var(--red); }
+  .riddle-status.cooldown { color: var(--yellow); }
+
+  /* Poem line text */
+  .poem-line-text {
+    display: none;
+    font-family: var(--mono);
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--green);
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+    white-space: nowrap;
+  }
+  .poem-line-text.reveal { display: block; }
+  .poem-line-text .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: var(--green);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: cursor-blink 0.6s ease infinite;
+  }
+
+  @keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+  @keyframes glow-pulse {
+    0%   { text-shadow: none; }
+    50%  { text-shadow: 0 0 14px rgba(0,204,102,0.6); }
+    100% { text-shadow: 0 0 4px rgba(0,204,102,0.2); }
+  }
+
+  @media (max-width: 650px) {
+    header, .goal-banner { padding-left: 20px; padding-right: 20px; }
+    main { padding: 24px 20px 60px; }
+    .riddle-row { grid-template-columns: 36px 1fr; }
+    .riddle-input-area { grid-column: 1 / -1; border-top: 1px solid var(--border); }
+    .riddle-text { border-right: none; }
+    .logo { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">THE <span>STORYTELLER</span></div>
+  <div class="subtitle-line" style="font-size:1.3rem;letter-spacing:0.06em;color:#aaa;font-family:var(--body);font-weight:300;margin-top:8px;">The Architect</div>
+  <div class="subtitle-line" style="margin-top:8px;">LEGENDS OF RUNETERRA · LND COMMUNITY EVENT · LCS #10</div>
+  <div class="subtitle-line" style="margin-top:2px;">Presented by Storyteller & Lawa · Chapter IV</div>
+</header>
+
+<div class="goal-banner">
+  Guess all 10 champion riddles. Get 1 line for each right guess. Put all lines together to solve who the next <strong>STORYTELLER</strong> is.
+</div>
+
+<main>
+  <div class="section-title">PARTICIPANT REGISTRATION</div>
+
+  <div class="discord-block">
+    <div class="field-label">Discord Username</div>
+    <input type="text" id="discord-input" placeholder="Enter your Discord name" autocomplete="off" />
+    <div class="hint">// your name will be stored alongside your answers</div>
+    <button class="enter-btn" id="confirm-btn" onclick="confirmDiscord()">▶ ENTER</button>
+  </div>
+
+  <div id="info-box" class="info-box error"></div>
+
+  <div id="cipher-section" style="display:none;">
+    <div class="section-title">CHAMPION CIPHER — 10 RIDDLES</div>
+    <div class="riddles-grid" id="riddles-grid"></div>
+    <div id="poem-hint" style="display:none;margin-top:20px;" class="hint">// Read the lines carefully and try to guess who the next Storyteller is.</div>
+  </div>
+</main>
+
+<script>
+  // ═══════════════════════════════════════════════════════════════
+  //  CONFIG — replace placeholders with real riddles & answers
+  // ═══════════════════════════════════════════════════════════════
+
+  const RIDDLES = [
+    { text: "You think I live within the dark,\nbut you don't know I am full of love.", answer: "morgana" },
+    { text: "I lost a brother in search for power,\neverything we built began to devour.", answer: "jayce" },
+    { text: "As a soul of this island,\nI don't anymore know a silence.", answer: "karma" },
+    { text: "Once I got a tattoo,\nturns out one was never gonna do.", answer: "ryze" },
+    { text: "There is no warrior who could match me,\nnot one alive brave enough to catch me.", answer: "jax" },
+    { text: "As frozen as it gets,\nso even a darkness forgets.", answer: "lissandra" },
+    { text: "Can you even spot me behind my gun?\nMy battles are always a fun.", answer: "tristana" },
+    { text: "Now I only create for others,\nas my light slowly smothers.", answer: "aurelion sol" },
+    { text: "Thunder, feel the thunder.\nLightning then the thunder.", answer: "volibear" },
+    { text: "I closely guard my secret,\nthe truth? I dare not to speak it.", answer: "lux" },
+  ];
+
+  const CORRECT_NAMES = ["Morgana","Jayce","Karma","Ryze","Jax","Lissandra","Tristana","Aurelion Sol","Volibear","Lux"];
+
+  // Poem lines — one per riddle, shown to first solver of that riddle
+  const POEM_LINES = [
+    "Born beneath the eagle's wings,",
+    "carrying the weight of ancient things.",
+    "With love for his lands he held the doors,",
+    "and built a ground where the battle roars.",
+    "He gave a goddess wings to touch the sky.",
+    "Then he carved himself a throne,",
+    "and claimed this world as his own.",
+    "He was always there - you wonder why.",
+    "One who forged the arena near perfect,",
+    "now he stands here \u2014 the architect.",
+  ];
+
+  // Discord webhook — replace with real URL from Lawa
+  const WEBHOOK_URL = "YOUR_WEBHOOK_URL_HERE"; // Discord webhook - add later
+  const SHEETS_URL = "https://script.google.com/macros/s/AKfycbyJzVnam2H282_CaU2jYR62wqr2k4eaGta8YmxoLL2bsJW-WKFpKtN6lIP_sZSQdPE/exec";
+
+  const COOLDOWN_MS  = 5 * 60 * 1000; // 5 minutes
+  const STORAGE_KEY  = "storyteller_ch4_v2";
+  const SOLVERS_KEY  = "storyteller_ch4_v2_solvers";
+
+  // ═══════════════════════════════════════════════════════════════
+  //  STATE
+  // ═══════════════════════════════════════════════════════════════
+
+  let currentDiscord = "";
+
+  function loadUserData() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch { return {}; }
+  }
+  function saveUserData(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+
+  function loadSolvers() {
+    try { return JSON.parse(localStorage.getItem(SOLVERS_KEY) || "{}"); } catch { return {}; }
+  }
+  function saveSolvers(d) { localStorage.setItem(SOLVERS_KEY, JSON.stringify(d)); }
+
+  function getUserRecord(discordKey) {
+    const data = loadUserData();
+    if (!data[discordKey]) {
+      data[discordKey] = { solved: new Array(10).fill(false), cooldowns: new Array(10).fill(0) };
+      saveUserData(data);
+    }
+    return { data, record: data[discordKey] };
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  BUILD GRID
+  // ═══════════════════════════════════════════════════════════════
+
+  function buildGrid() {
+    const grid = document.getElementById("riddles-grid");
+    grid.innerHTML = "";
+    RIDDLES.forEach((r, i) => {
+      const row = document.createElement("div");
+      row.className = "riddle-row";
+      row.id = `row-${i}`;
+      row.innerHTML = `
+        <div class="riddle-num">${String(i+1).padStart(2,"0")}</div>
+        <div class="riddle-text" id="text-${i}">
+          <div id="clue-${i}">${r.text.replace(/\n/g,"<br>")}</div>
+          <div class="poem-line-text" id="poem-${i}"></div>
+        </div>
+        <div class="riddle-input-area" id="input-area-${i}">
+          <input type="text" id="ans-${i}" placeholder="Champion name..." autocomplete="off" spellcheck="false" />
+          <button class="riddle-submit" id="btn-${i}" onclick="submitRiddle(${i})">▶ GUESS</button>
+          <div class="riddle-status" id="status-${i}"></div>
+        </div>
+      `;
+      grid.appendChild(row);
+      document.getElementById(`ans-${i}`).addEventListener("keydown", e => {
+        if (e.key === "Enter") submitRiddle(i);
+      });
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  SUBMIT SINGLE RIDDLE
+  // ═══════════════════════════════════════════════════════════════
+
+  function submitRiddle(i) {
+    const discordRaw = document.getElementById("discord-input").value.trim();
+    if (!discordRaw) {
+      showInfo("⚠ Please enter your Discord username first.", "error");
+      return;
+    }
+    currentDiscord = discordRaw;
+    const discordKey = discordRaw.toLowerCase();
+    const { data, record } = getUserRecord(discordKey);
+
+    if (record.solved[i]) return;
+
+    const now = Date.now();
+    const cooldownUntil = record.cooldowns[i] || 0;
+    if (now < cooldownUntil) {
+      const secsLeft = Math.ceil((cooldownUntil - now) / 1000);
+      const mins = Math.floor(secsLeft / 60);
+      const secs = secsLeft % 60;
+      setStatus(i, `cooldown: ${mins}:${String(secs).padStart(2,"0")} remaining`, "cooldown");
+      setRowState(i, "state-cooldown");
+      return;
+    }
+
+    const val = (document.getElementById(`ans-${i}`)?.value || "").trim().toLowerCase();
+    if (!val) return;
+
+    if (val === RIDDLES[i].answer) {
+      // CORRECT
+      record.solved[i] = true;
+      saveUserData(data);
+      document.getElementById(`ans-${i}`).disabled = true;
+      document.getElementById(`btn-${i}`).disabled = true;
+      setStatus(i, `✓ ${CORRECT_NAMES[i]}`, "ok");
+      showLineReveal(i, true);
+
+      // Log to Google Sheets
+      const isFirst = !loadSolvers()[i];
+      const sheetsParams = new URLSearchParams({
+        discord: discordRaw,
+        riddle: String(i + 1),
+        champion: CORRECT_NAMES[i],
+        first: isFirst ? "yes" : "no"
+      });
+      fetch(SHEETS_URL + "?" + sheetsParams.toString(), { method: "GET", mode: "no-cors" }).catch(() => {});
+
+      // Show hint after first correct answer
+      document.getElementById("poem-hint").style.display = "block";
+
+      // Check first global solver
+      const solvers = loadSolvers();
+      if (!solvers[i]) {
+        solvers[i] = discordRaw;
+        saveSolvers(solvers);
+        sendWebhook(discordRaw, i, Object.keys(solvers).length);
+      }
+
+    } else {
+      // WRONG — cooldown
+      record.cooldowns[i] = now + COOLDOWN_MS;
+      saveUserData(data);
+      setRowState(i, "state-wrong");
+      setStatus(i, "✗ incorrect — 5 min cooldown", "err");
+      document.getElementById(`btn-${i}`).disabled = true;
+      document.getElementById(`ans-${i}`).disabled = true;
+      startCooldownTimer(i, discordKey);
+
+      // Log wrong answer to Sheets
+      const wrongParams = new URLSearchParams({
+        discord: discordRaw,
+        riddle: String(i + 1),
+        champion: val,
+        first: "wrong"
+      });
+      fetch(SHEETS_URL + "?" + wrongParams.toString(), { method: "GET", mode: "no-cors" }).catch(() => {});
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  COOLDOWN TIMER
+  // ═══════════════════════════════════════════════════════════════
+
+  function startCooldownTimer(i, discordKey) {
+    const tick = setInterval(() => {
+      const { record } = getUserRecord(discordKey);
+      if (record.solved[i]) { clearInterval(tick); return; }
+      const now = Date.now();
+      const secsLeft = Math.ceil((record.cooldowns[i] - now) / 1000);
+      if (secsLeft <= 0) {
+        clearInterval(tick);
+        setStatus(i, "// ready to guess again", "cooldown");
+        setRowState(i, "");
+        document.getElementById(`btn-${i}`).disabled = false;
+        document.getElementById(`ans-${i}`).disabled = false;
+        document.getElementById(`ans-${i}`).value = "";
+      } else {
+        const mins = Math.floor(secsLeft / 60);
+        const secs = secsLeft % 60;
+        setStatus(i, `cooldown: ${mins}:${String(secs).padStart(2,"0")} remaining`, "cooldown");
+      }
+    }, 1000);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  POEM REVEAL — TYPEWRITER
+  // ═══════════════════════════════════════════════════════════════
+
+  function showLineReveal(i, animate) {
+    const line = POEM_LINES[i] || `Line ${i + 1}`;
+    const fullText = line;
+    const poemEl = document.getElementById(`poem-${i}`);
+    const clueEl = document.getElementById(`clue-${i}`);
+
+    if (animate) {
+      clueEl.style.transition = "opacity 0.4s ease";
+      clueEl.style.opacity = "0";
+      setTimeout(() => {
+        clueEl.style.display = "none";
+        poemEl.classList.add("reveal");
+        setRowState(i, "state-poem");
+
+        const cursor = document.createElement("span");
+        cursor.className = "cursor";
+        poemEl.innerHTML = "";
+        poemEl.appendChild(cursor);
+
+        let charIndex = 0;
+        function typeNextChar() {
+          if (charIndex < fullText.length) {
+            poemEl.insertBefore(document.createTextNode(fullText[charIndex]), cursor);
+            charIndex++;
+            const ch = fullText[charIndex - 1];
+            let delay = 80 + Math.random() * 80;
+            if (ch === '"' || ch === ',' || ch === '.') delay += 120 + Math.random() * 100;
+            if (ch === ' ') delay += 20 + Math.random() * 40;
+            setTimeout(typeNextChar, delay);
+          } else {
+            cursor.remove();
+            poemEl.style.animation = "glow-pulse 1.4s ease forwards";
+          }
+        }
+        setTimeout(typeNextChar, 200);
+      }, 450);
+
+    } else {
+      // Instant restore on reload
+      clueEl.style.display = "none";
+      poemEl.textContent = fullText;
+      poemEl.style.display = "block";
+      poemEl.style.maxWidth = "100%";
+      poemEl.style.opacity = "1";
+      setRowState(i, "state-poem");
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  DISCORD WEBHOOK
+  // ═══════════════════════════════════════════════════════════════
+
+  function sendWebhook(discord, riddleIndex, solverRank) {
+    if (!WEBHOOK_URL || WEBHOOK_URL === "YOUR_WEBHOOK_URL_HERE") return;
+    const ordinal = ["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th"][solverRank-1] || `${solverRank}th`;
+    const content = `🏆 **${discord}** is the **${ordinal}** to solve Riddle #${riddleIndex+1} — *${CORRECT_NAMES[riddleIndex]}*`;
+    fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content })
+    }).catch(() => {});
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  RESTORE STATE ON LOGIN
+  // ═══════════════════════════════════════════════════════════════
+
+  function restoreState() {
+    const discordKey = currentDiscord.toLowerCase();
+    const { record } = getUserRecord(discordKey);
+    const now = Date.now();
+
+    if (record.solved.some(Boolean)) document.getElementById("poem-hint").style.display = "block";
+    RIDDLES.forEach((_, i) => {
+      if (record.solved[i]) {
+        document.getElementById(`ans-${i}`).disabled = true;
+        document.getElementById(`btn-${i}`).disabled = true;
+        document.getElementById(`ans-${i}`).value = CORRECT_NAMES[i];
+        setStatus(i, `✓ ${CORRECT_NAMES[i]}`, "ok");
+        showLineReveal(i, false);
+      } else if (record.cooldowns[i] && now < record.cooldowns[i]) {
+        document.getElementById(`btn-${i}`).disabled = true;
+        document.getElementById(`ans-${i}`).disabled = true;
+        setRowState(i, "state-cooldown");
+        startCooldownTimer(i, discordKey);
+        const secsLeft = Math.ceil((record.cooldowns[i] - now) / 1000);
+        const mins = Math.floor(secsLeft / 60);
+        const secs = secsLeft % 60;
+        setStatus(i, `cooldown: ${mins}:${String(secs).padStart(2,"0")} remaining`, "cooldown");
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  HELPERS
+  // ═══════════════════════════════════════════════════════════════
+
+  function setRowState(i, cls) {
+    const row = document.getElementById(`row-${i}`);
+    row.className = "riddle-row" + (cls ? " " + cls : "");
+  }
+
+  function setStatus(i, msg, type) {
+    const el = document.getElementById(`status-${i}`);
+    el.textContent = msg;
+    el.className = `riddle-status ${type}`;
+  }
+
+  function showInfo(msg, type) {
+    const box = document.getElementById("info-box");
+    box.textContent = msg;
+    box.className = `info-box ${type} show`;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  INIT
+  // ═══════════════════════════════════════════════════════════════
+
+  buildGrid();
+
+  function confirmDiscord() {
+    const discordRaw = document.getElementById("discord-input").value.trim();
+    if (!discordRaw) {
+      showInfo("⚠ Please enter your Discord username.", "error");
+      return;
+    }
+    currentDiscord = discordRaw;
+    document.getElementById("discord-input").disabled = true;
+    document.getElementById("confirm-btn").style.display = "none";
+    document.getElementById("info-box").className = "info-box";
+
+    const section = document.getElementById("cipher-section");
+    section.style.display = "block";
+    section.style.opacity = "0";
+    section.style.transform = "translateY(12px)";
+    section.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      section.style.opacity = "1";
+      section.style.transform = "translateY(0)";
+    }));
+    setTimeout(() => section.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+
+    restoreState();
+  }
+
+  document.getElementById("discord-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") confirmDiscord();
+  });
+
+  // ── Admin tools ──────────────────────────────────────────────
+  window.storyAdmin = function() {
+    const data = loadUserData();
+    const solvers = loadSolvers();
+    console.group("📋 STORYTELLER CH4 — SUBMISSIONS");
+    console.log("First solvers per riddle:", solvers);
+    Object.entries(data).forEach(([key, val]) => {
+      const solved = val.solved.filter(Boolean).length;
+      console.log(`👤 ${key} — solved: ${solved}/10`);
+    });
+    console.groupEnd();
+    return { data, solvers };
+  };
+
+  window.storyAdminExport = function() {
+    const data = loadUserData();
+    let csv = "Discord,Solved\n";
+    Object.entries(data).forEach(([key, val]) => {
+      csv += `${key},${val.solved.filter(Boolean).length}\n`;
+    });
+    const blob = new Blob([csv], {type:"text/csv"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "storyteller_ch4_submissions.csv"; a.click();
+  };
+
+  window.storyReset = function() {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SOLVERS_KEY);
+    console.log("✓ All CH4 data cleared.");
+    location.reload();
+  };
+</script>
+</body>
+</html>
